@@ -13,12 +13,13 @@ import asyncio
 from datetime import datetime
 from pyrogram import filters
 from wbb import app, WELCOME_DELAY_KICK_SEC
+from wbb.utils.errors import capture_err
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.types import ChatPermissions
-from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
-
+from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, ChatAdminRequired
 
 @app.on_message(filters.new_chat_members)
+@capture_err
 async def welcome(_, message: Message):
     """Mute new member and send message with button"""
     new_members = [f"{u.mention}" for u in message.new_chat_members]
@@ -26,6 +27,7 @@ async def welcome(_, message: Message):
             "You will be removed from this chat if you are not verified "
             f"in {WELCOME_DELAY_KICK_SEC} seconds")
     await message.chat.restrict_member(message.from_user.id, ChatPermissions())
+
     button_message = await message.reply(
         text,
         reply_markup=InlineKeyboardMarkup(
@@ -76,6 +78,7 @@ async def kick_restricted_after_delay(delay, button_message: Message):
 
 
 @app.on_message(filters.left_chat_member)
+@capture_err
 async def left_chat_member(_, message: Message):
     """When a restricted member left the chat, ban him for a while"""
     group_chat = message.chat
