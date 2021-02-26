@@ -8,20 +8,22 @@ from cryptography.fernet import Fernet
 from wbb import app, FERNET_ENCRYPTION_KEY
 from wbb.utils import cust_filter, random_line
 from wbb.utils.errors import capture_err
+from wbb.utils.json_prettify import json_prettify
+from wbb.utils.fetch import fetch
+from wbb.utils.nekobin import neko
+
 
 __MODULE__ = "Misc"
 __HELP__ = '''/commit - Generate Funny Commit Messages
 /runs  - Idk Test Yourself
-/quote - Get Random Linux Quotes
 /id - Get Chat_ID or User_ID
 /random - Generate Random Complex Passwords
-/http - Get Cats Reference Photo For Http Error Codes
 /encrypt - Encrypt Text [Can Only Be Decrypted By This Bot]
 /decrypt - Decrypt Text
-/ipinfo - Get Info About An Ip Address
 /cheat - Get Programming Related Help
 /weather - To Get Weather Info
-/tr - Translate A Message
+/tr [en] - Translate A Message
+/json [URL] - Get Response From An API or Something. 
 #RTFM - Check it lol'''
 
 
@@ -75,7 +77,7 @@ async def random(_, message: Message):
     if len(message.command) != 2:
         await message.reply_text('"/random" Needs An Argurment.'
                                  ' Ex: `/random 5`')
-        random
+        return
     length = message.text.split(None, 1)[1]
 
     try:
@@ -129,21 +131,23 @@ async def decrypt(_, message: Message):
 @app.on_message(cust_filter.command(commands=("cheat")) & ~filters.edited)
 @capture_err
 async def cheat(_, message: Message):
+    if len(message.command) < 3:
+        await message.reply_text("/cheat [language] [query]")
+        return
     text = message.text.split(None, 1)[1]
-    ftext = text.split()
+    m = await message.reply_text("Searching")
     try:
+        ftext = text.split()
         language = ftext[0]
-    except IndexError:
-        await message.reply_text("/cheat [language] [query]")
-        return
-    try:
         query = ftext[1]
-    except IndexError:
-        await message.reply_text("/cheat [language] [query]")
-        return
-    r = requests.get(f"http://cht.sh/{language}/{query}?QT")
-    reply = r.text
-    await message.reply_text(f"`{reply}`")
+        data = requests.get(f"http://cht.sh/{language}/{query}?QT").text
+        if not data:
+            await m.edit("Found Literally Nothing!")
+            return
+        await m.edit(f"`{data}`")
+    except Exception as e:
+        await m.edit(str(e))
+        print(str(e))
 
 # Weather
 
@@ -151,22 +155,26 @@ async def cheat(_, message: Message):
 @app.on_message(cust_filter.command(commands=("weather")) & ~filters.edited)
 @capture_err
 async def weather(_, message: Message):
-    city = message.text.split(None, 1)[1]
     if len(message.command) != 2:
         await message.reply_text("/weather [city]")
         return
+    city = message.text.split(None, 1)[1]
+    m = await message.reply_text("Fetching Data")
     r = requests.get(f"https://wttr.in/{city}?mnTC0")
     data = r.text
-    await message.reply_text(f"`{data}`")
+    await m.edit(f"`{data}`")
 
 # Translate
 
 
 @app.on_message(cust_filter.command(commands=("tr")) & ~filters.edited)
 @capture_err
-async def tr(_, message: Message):
+async def tr(_, message):
+    if len(message.command) != 2:
+        await message.reply_text("/tr [LANGUAGE_CODE]")
+        return
     lang = message.text.split(None, 1)[1]
-    if not message.reply_to_message or lang == "":
+    if not message.reply_to_message or not lang:
         await message.reply_text(
             "Reply to a message with /tr [language code]"
             + "\nGet supported language list from here -"
@@ -174,10 +182,41 @@ async def tr(_, message: Message):
             + "/latest/#googletrans-languages"
         )
         return
-    text = message.reply_to_message.text
+    if message.reply_to_message.text:
+        text = message.reply_to_message.text
+    elif message.reply_to_message.caption:
+        text = message.reply_to_message.caption
     i = Translator().translate(text, dest=lang)
     await message.reply_text(i.text)
 
+
+fetch_limit = 0
+
+
+@app.on_message(filters.command("json") & ~filters.edited)
+@capture_err
+async def json_fetch(_, message):
+    global fetch_limit
+    if len(message.command) != 2:
+        await message.reply_text("/json [URL]")
+        return
+    elif fetch_limit > 500:
+        await message.reply_text("Today's Quota Exceeded!, lol")
+        return
+    url = message.text.split(None, 1)[1]
+    try:
+        data = await fetch(url)
+        data = await json_prettify(data)
+        fetch_limit += 1
+        if len(data) < 4090:
+            await message.reply_text(data)
+        else:
+            neko_link = await neko(data)
+            await message.reply_text(f"[OUTPUT_TOO_LONG]({neko_link})", disable_web_page_preview=True)
+    except Exception as e:
+        await message.reply_text(str(e))
+        print(str(e))
+    
 
 @app.on_message(filters.command('bun'))
 @capture_err
