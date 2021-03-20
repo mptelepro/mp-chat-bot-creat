@@ -82,7 +82,7 @@
          "required": false,
          "value": ""
       },
-      "SUDO_USERS_ID": {
+      "SUDO_USER_ID": {
          "description": "Spamwatch API Token, Get one from @SpamWatchBot.",
          "required": false,
          "value": ""
