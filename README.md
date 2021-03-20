@@ -34,6 +34,12 @@ Just Another Telegram Bot Written In Python Using Pyrogram.
 * Nekobin (Paste Code/Text)
 * And Much More...
 
+## How To Host
+The easiest way to deploy this Bot
+<p align="center"><a href="https://heroku.com/deploy?template=https://github.com/mptelepro/MashaRoBot"> <img src="https://img.shields.io/badge/Deploy%20To%20Heroku-black?style=for-the-badge&logo=heroku" width="220" height="38.45"/></a></p>
+ 
+
+
 ## Motive of This Bot
 
 We wanted to create a Telegram Bot which could do almost everything a bot can do...
