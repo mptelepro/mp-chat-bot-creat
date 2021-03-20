@@ -1,14 +1,14 @@
-bot_token = "1455:AAE4qFS3nF-0Tn"
+bot_token = "1297166370:AAF3oSPlzBIzzv-s3oCbKQ7QDjKw0XzXW5M"
 
-api_id = 69
+api_id = 1749924
 
-api_hash = "e46b6c854d2bf580"
+api_hash = "87e4a056bb574f7939ac283b9a9187ab"
 
-OWNER_ID = 1243703097
+OWNER_ID = 984441749
 
-sudo_users_id = [354165569, 564426514, 686215463]
+sudo_users_id = [984441749, 984441749, 984441749]
 
-log_group_id = -1001337393587
+log_group_id = -1001367221700
 
 # https://cryptography.io/en/latest/fernet.html
 fernet_encryption_key = "iKMq0WZMnJKjMQxZWKtv-cplMuF_LoyshXj0XbTGGWM="
