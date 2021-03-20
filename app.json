@@ -62,7 +62,7 @@
          "required": true,
          "value": "-123456798"
       },
-      "JOIN_LOGGER": {
+      "LOG_GROUP_ID": {
          "description": "A channel where bot will print who added it to what group, useful during debugging or spam handling.",
          "required": true,
          "value": "-123456798"
@@ -82,7 +82,7 @@
          "required": false,
          "value": ""
       },
-      "sw_api": {
+      "SUDO_USERS_ID": {
          "description": "Spamwatch API Token, Get one from @SpamWatchBot.",
          "required": false,
          "value": ""
